@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,13 +21,16 @@ namespace MvcMovie.Controllers
         // GET: Movies
         public async Task<IActionResult> Index(string movieGenre, string searchString)
         {
-            // Use LINQ to get list of genres.
-            IQueryable<string> genreQuery = from m in _context.Movie
-                                            orderby m.Genre
-                                            select m.Genre;
-
-            // Define LINQ query to select movies
-            var movies = from m in _context.Movie
+            // Write it like this:
+            //
+            List<string> genres = await _context.Movie.Select(m => m.Genre).Distinct().ToListAsync();
+            //
+            // Or use LINQ:
+            // IQueryable<string> genreQuery = from m in _context.Movie
+            //     orderby m.Genre
+            //     select m.Genre;
+            
+            IQueryable<Movie> movies = from m in _context.Movie
                         select m;
 
             if (!string.IsNullOrEmpty(searchString))
@@ -40,18 +42,23 @@ namespace MvcMovie.Controllers
                 movies = movies.Where(s => s.Title.Contains(searchString));
             }
 
+            // Modify the query if a specific genre is requested. 
             if (!string.IsNullOrEmpty(movieGenre))
             {
                 movies = movies.Where(x => x.Genre == movieGenre);
             }
 
-            var movieGenreVM = new MovieGenreViewModel
+            // Here we populate out MovieGenreViewModel
+            var movieGenreVm = new MovieGenreViewModel
             {
-                Genres = new SelectList(await genreQuery.Distinct().ToListAsync()),
+                // Genres: a SelectList containing genres
+                Genres = new SelectList(genres),
+                // Movies a List containing movies
                 Movies = await movies.ToListAsync()
             };
 
-            return View(movieGenreVM);
+            // This will resolve view /Views/Movies/Index
+            return View(movieGenreVm);
         }
 
         // GET: Movies/Details/5

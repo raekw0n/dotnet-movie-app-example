@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace MvcMovie.Models
 {
+    /**
+     * A view model represents the data that you want to display in your view, it's used for both static text
+     * or input values that can be persisted to the database
+     */
     public class MovieGenreViewModel
     {
         public List<Movie> Movies { get; set; }

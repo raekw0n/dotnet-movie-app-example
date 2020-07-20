@@ -13,10 +13,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MvcMovie
 {
+    /**
+     * ASP.NET Core apps use a Startup class which is named Startup by convention. The Startup class:
+     *
+     * - Optionally includes a ConfigureServices method to configure the app's services. A service is a reusable
+     *   component that provides app functionality. Services are registered in ConfigureServices and consumed across
+     *   the app via DI or ApplicationServices.
+     * 
+     * - Includes a Configure method to create the app's requess processing pipeline.
+     *
+     * ConfigureServices and Configure are called by the ASP.NET Core runtime when the app starts:
+     */
     public class Startup
     {
+        // Only the following service types can be injected into the Startup constructor when using the GenericHost:
+        // - IWebHostConfiguration
+        // - IHostConfiguration
+        // - IConfiguration
         public Startup(IConfiguration configuration)
         {
+            // Configuration providers, see notes in Program.cs for more details
             Configuration = configuration;
         }
 
@@ -52,9 +68,18 @@ namespace MvcMovie
 
             app.UseEndpoints(endpoints =>
             {
+                // ASP.NET Core MVC invokes controller classes and action method within them depending on the incoming
+                // URL. The default URL routing logic used by MVC uses a format like this to determine what code to
+                // invoke:
+                //
+                // - /[Controller]/[ActionName]/[Parameters]
+                //
+                // As you can see below, the app will default to /Movies/Index if a user browses to the app and does not
+                // supply any URL segments.
+                //
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Movies}/{action=Index}/{id?}");
             });
         }
     }
